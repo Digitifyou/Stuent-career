@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Growth Planner</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body { padding-bottom: 5rem; }
+        .container { max-width: 800px; margin: 2rem auto; }
+        .grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        #loader { display: none; text-align: center; }
+        #results { margin-top: 2rem; border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px; background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <hgroup>
+            <h1>Personalized Career Action Plan 🚀</h1>
+            <h2>Fill in your details for a custom roadmap to your dream job.</h2>
+        </hgroup>
+
+        <form id="careerForm">
+            <div class="grid">
+                <label>
+                    Your Name
+                    <input type="text" name="name" placeholder="e.g., Priya Sharma" required>
+                </label>
+                <label>
+                    Your Age
+                    <input type="number" name="age" placeholder="e.g., 22">
+                </label>
+            </div>
+
+            <div class="grid">
+                 <label>
+                    Degree
+                    <input type="text" name="degree" placeholder="e.g., B.Tech in Computer Science" required>
+                </label>
+                <label>
+                    Year of Pass Out
+                    <input type="number" name="pass_out_year" placeholder="e.g., 2024">
+                </label>
+            </div>
+            
+             <label for="location">Target City</label>
+             <input type="text" id="location" name="location" placeholder="e.g., Chennai, Bengaluru" required>
+
+             <label for="dream_job">Desired Job Title</label>
+             <input type="text" id="dream_job" name="dream_job" placeholder="e.g., Data Analyst, UX Designer" required>
+             
+             <label for="interests">Area of Interest</label>
+             <input type="text" id="interests" name="interests" placeholder="e.g., Machine Learning, Mobile App Development">
+
+             <label for="strengths">Strengths</label>
+             <input type="text" id="strengths" name="strengths" placeholder="e.g., Problem Solving, Team Collaboration">
+
+             <label for="weaknesses">Weaknesses</label>
+             <input type="text" id="weaknesses" name="weaknesses" placeholder="e.g., Public Speaking, Overthinking">
+
+            <label for="resume">Paste Your Full Resume</label>
+            <textarea id="resume" name="resume" rows="15" placeholder="Paste your entire resume content here..." required></textarea>
+
+            <button type="submit">Generate My Action Plan</button>
+        </form>
+
+        <div id="loader" role="alert" aria-busy="true">Analyzing your profile... Please wait.</div>
+
+        <div id="results">
+            </div>
+    </main>
+
+    <script>
+        // The JavaScript remains exactly the same as before.
+        // It's designed to automatically handle all form fields.
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('careerForm');
+            const loader = document.getElementById('loader');
+            const resultsDiv = document.getElementById('results');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                loader.style.display = 'block';
+                resultsDiv.innerHTML = '';
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch('api.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    if (data.plan) {
+                        resultsDiv.innerHTML = marked.parse(data.plan);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    resultsDiv.innerHTML = `<p style="color: red;"><strong>An error occurred:</strong> ${error.message}</p>`;
+                } finally {
+                    loader.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
